@@ -12,6 +12,7 @@ START TRANSACTION;
 
 INSERT INTO users_TEMP (username, password, enabled) VALUES
   ('admin','password',true),
+  ('demo','demo',true),
   ('user','password',true);
 
 
