@@ -13,13 +13,28 @@ START TRANSACTION;
 INSERT INTO client_details_TEMP (client_id, client_secret, client_name, dynamically_registered, refresh_token_validity_seconds, access_token_validity_seconds, id_token_validity_seconds, allow_introspection) VALUES
 	('client', 'secret', 'Test Client', false, null, 3600, 600, true);
 
+--TODO: Curl script for these...
 INSERT INTO client_scope_TEMP (owner_id, scope) VALUES
 	('client', 'openid'),
 	('client', 'profile'),
 	('client', 'email'),
 	('client', 'address'),
 	('client', 'phone'),
+	('client', 'search'),
+	('client', 'summary'),
+	('client', 'smart'),
+	('client', 'smart/orchestrate_launch'),
+	('client', 'launch'),
+	('client', 'launch/patient'),
+	('client', 'launch/encounter'),
+	('client', 'launch/other'),
+	('client', 'smart'),
+	('client', 'user/Patient.read'),
+	('client', 'user/*.*'),
+	('client', 'patient/*.*'),
+	('client', 'patient/*.read'),	
 	('client', 'offline_access');
+
 
 INSERT INTO client_redirect_uri_TEMP (owner_id, redirect_uri) VALUES
 	('client', 'http://localhost/'),
@@ -31,8 +46,8 @@ INSERT INTO client_grant_type_TEMP (owner_id, grant_type) VALUES
 	('client', 'implicit'),
 	('client', 'refresh_token');
 	
---
 -- Merge the temporary clients safely into the database. This is a two-step process to keep clients from being created on every startup with a persistent store.
+--
 --
 
 MERGE INTO client_details 
