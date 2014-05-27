@@ -1,4 +1,4 @@
-package org.mitre.openid.connect;
+package org.smartplatforms.oauth2;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -8,14 +8,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.el.MapELResolver;
-
-import org.apache.http.entity.StringEntity;
-import org.bouncycastle.asn1.ocsp.Request;
-import org.bouncycastle.jcajce.provider.digest.GOST3411.HashMac;
 import org.mitre.oauth2.service.ClientDetailsEntityService;
-import org.mitre.openid.connect.token.LaunchContextResolver;
-import org.mitre.openid.connect.token.NeedUnmetException;
+import org.mitre.openid.connect.ConnectOAuth2RequestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Service;
@@ -23,8 +17,6 @@ import org.springframework.stereotype.Service;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 @Service
@@ -41,7 +33,8 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 	};
 
 	@Autowired
-	public SmartOAuth2RequestFactory(ClientDetailsEntityService clientDetailsService) {
+	public SmartOAuth2RequestFactory(
+			ClientDetailsEntityService clientDetailsService) {
 		super(clientDetailsService);
 	}
 
@@ -50,7 +43,6 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 			Map<String, String> inputParams) {
 		AuthorizationRequest ret = super
 				.createAuthorizationRequest(inputParams);
-
 
 		HashMap<String, String> launchReqs = new HashMap<String, String>();
 		for (Entry<String, String> e : FluentIterable.from(ret.getScope())
@@ -69,19 +61,21 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 				e1.printStackTrace();
 				return null;
 			}
-		} else if (requestingLaunch){ // asking for launch, but no launch ID provided
+		} else if (requestingLaunch) { // asking for launch, but no launch ID
+										// provided
 			ret.getExtensions().put("external_launch_required", launchReqs);
 		}
 
 		ret.setScope(Sets.difference(ret.getScope(),
 				FluentIterable.from(ret.getScope()).filter(isLaunchContext)
-				.toSet()));
+						.toSet()));
 
-		if(launchId != null){
+		if (launchId != null) {
 			Set<String> plusLaunch = new HashSet<String>(ret.getScope());
 			plusLaunch.add("launch");
 			ret.setScope(plusLaunch);
 		}
+		
 		return ret;
 	}
 
@@ -108,14 +102,5 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 
 		}
 	};
-
-	private Predicate<String> isRequestedIn(final AuthorizationRequest ret) {
-		return new Predicate<String>() {
-			@Override
-			public boolean apply(String input) {
-				return ret.getScope().contains(input);
-			}
-		};
-	}
 
 }

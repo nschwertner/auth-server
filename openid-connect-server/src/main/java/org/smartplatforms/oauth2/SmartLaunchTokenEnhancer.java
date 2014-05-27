@@ -1,14 +1,14 @@
-package org.mitre.openid.connect.token;
+package org.smartplatforms.oauth2;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.mitre.oauth2.model.LaunchContextEntity;
 import org.mitre.oauth2.model.OAuth2AccessTokenEntity;
+import org.mitre.openid.connect.token.ConnectTokenEnhancer;
+import org.smartplatforms.oauth2.LaunchContextEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Sets;
 
 @Component
 public class SmartLaunchTokenEnhancer extends ConnectTokenEnhancer {

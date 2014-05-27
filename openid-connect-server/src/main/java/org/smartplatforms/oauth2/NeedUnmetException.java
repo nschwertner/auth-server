@@ -1,4 +1,4 @@
-package org.mitre.openid.connect.token;
+package org.smartplatforms.oauth2;
 
 public class NeedUnmetException extends Exception {
 

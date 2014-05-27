@@ -1,4 +1,4 @@
-package org.mitre.oauth2.model;
+package org.smartplatforms.oauth2;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;

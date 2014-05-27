@@ -35,7 +35,7 @@
 	that want it, even though those consumers each call it by a different name...
 	 -->
 	<bean id="oAuth2RequestFactory" 
-		class="org.mitre.openid.connect.SmartOAuth2RequestFactory" 
+		class="org.smartplatforms.oauth2.SmartOAuth2RequestFactory" 
 		name="authRequestFactory, requestFactory"/>
 	
 	<oauth:authorization-server 
@@ -55,17 +55,17 @@
 		<oauth:custom-grant token-granter-ref="jwtAssertionTokenGranter" />
 	</oauth:authorization-server>
 
-	<bean id="tokenEnhancer" class="org.mitre.openid.connect.token.SmartLaunchTokenEnhancer" />
+	<bean id="tokenEnhancer" class="org.smartplatforms.oauth2.SmartLaunchTokenEnhancer" />
 	<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
 	<bean id="oauthRequestValidator" class="org.mitre.oauth2.token.StructuredScopeAwareOAuth2RequestValidator" />
 
-	<bean id="smartLaunchContextResolver" class="org.mitre.openid.connect.token.SmartLaunchContextResolver">
+	<bean id="smartLaunchContextResolver" class="org.smartplatforms.oauth2.SmartLaunchContextResolver">
 	  <property name = "fhirEndpoint" value= "${CONTEXT_FHIR_ENDPOINT:http://localhost:8080}"/>
 	  <property name = "username" value= "${CONTEXT_USERNAME:client}"/>
 	  <property name = "password" value = "${CONTEXT_PASSWORD:secret}"/>
 	</bean>
 
-	<bean id="oauth2AuthorizationEndpoint" class="org.mitre.openid.connect.web.SmartAuthorizationEndpoint">
+	<bean id="oauth2AuthorizationEndpoint" class="org.smartplatforms.oauth2.SmartAuthorizationEndpoint">
 	  <property name = "tokenGranter" ref = "oauth2TokenGranter"/>
 	  <property name = "clientDetailsService" ref = "defaultOAuth2ClientDetailsEntityService"/>
 	  <property name = "oAuth2RequestFactory" ref = "oAuth2RequestFactory"/>
