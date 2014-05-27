@@ -197,7 +197,6 @@ public class OAuthConfirmationController {
 
 		// inject a random value for CSRF purposes
 		model.put("csrf", authRequest.getExtensions().get("csrf"));
-
 		return "approve";
 	}
 

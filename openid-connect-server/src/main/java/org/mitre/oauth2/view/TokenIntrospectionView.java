@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +59,6 @@ public class TokenIntrospectionView extends AbstractView {
 		Writer out;
 
 		try {
-
 			out = response.getWriter();
 			UserInfo user = (UserInfo)model.get("user");
 			Object obj = model.get("token");
@@ -106,6 +106,11 @@ public class TokenIntrospectionView extends AbstractView {
 		token.addProperty("client_id", src.getAuthenticationHolder().getAuthentication().getOAuth2Request().getClientId());
 
 		token.addProperty("token_type", src.getTokenType());
+		token.addProperty("token_type", src.getTokenType());
+		for (Entry<String, Object> ai  : src.getAdditionalInformation().entrySet()) {
+			token.addProperty(ai.getKey(), ai.getValue().toString());
+		}
+
 
 		return token;		
 	}

@@ -100,7 +100,6 @@ public class IntrospectionEndpoint {
 
 			tokenClient = access.getClient();
 			scopes = access.getScope();
-
 			token = access;
 
 			user = userInfoService.getByUsernameAndClientId(access.getAuthenticationHolder().getAuthentication().getName(), tokenClient.getClientId());
