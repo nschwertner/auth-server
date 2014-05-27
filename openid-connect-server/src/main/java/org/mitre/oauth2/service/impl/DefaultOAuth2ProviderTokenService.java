@@ -199,9 +199,6 @@ public class DefaultOAuth2ProviderTokenService implements OAuth2TokenEntityServi
 			// TODO enhance is supposed to return a new token, so this should be reassignment...
 			// need to figure out the right exception to use.
 			token = (OAuth2AccessTokenEntity) tokenEnhancer.enhance(token, authentication);
-			if (token == null) {
-				return token;
-			}
 			tokenRepository.saveAccessToken(token);
 
 			//Add approved site reference, if any
