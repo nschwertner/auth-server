@@ -53,7 +53,7 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 		boolean requestingLaunch = launchReqs.containsKey("launch");
 		String launchId = launchReqs.remove("launch");
 
-		if (launchId != null) {
+		if (launchId != null && !launchId.equals("?")) {
 			try {
 				ret.getExtensions().put("launch_context",
 						launchContextResolver.resolve(launchId, launchReqs));
@@ -64,6 +64,7 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 		} else if (requestingLaunch) { // asking for launch, but no launch ID
 										// provided
 			ret.getExtensions().put("external_launch_required", launchReqs);
+			ret.getExtensions().put("client_id", ret.getClientId());
 		}
 
 		ret.setScope(Sets.difference(ret.getScope(),

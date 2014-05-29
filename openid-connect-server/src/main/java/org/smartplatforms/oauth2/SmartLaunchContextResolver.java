@@ -22,8 +22,10 @@ import com.google.gson.JsonParser;
 public class SmartLaunchContextResolver implements LaunchContextResolver {
 
 	private String fhirEndpoint;
+	private String resolveEndpoint;
 	private String username;
 	private String password;
+	
 
 	@Override
 	public Serializable resolve(String launchId, Map<String,String> needs) throws NeedUnmetException {
@@ -81,6 +83,14 @@ public class SmartLaunchContextResolver implements LaunchContextResolver {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getResolveEndpoint() {
+		return resolveEndpoint;
+	}
+
+	public void setResolveEndpoint(String resolveEndpoint) {
+		this.resolveEndpoint = resolveEndpoint;
 	}
 
 }
