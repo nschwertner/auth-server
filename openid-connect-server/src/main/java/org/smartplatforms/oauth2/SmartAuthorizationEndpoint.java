@@ -79,7 +79,6 @@ public class SmartAuthorizationEndpoint extends AuthorizationEndpoint implements
 			HashMap<String, String> launchReqs = (HashMap<String, String>) authorizationRequest.getExtensions().get("external_launch_required");
 			String goals = Joiner.on(",").join(launchReqs.keySet());
 			
-			
 			ClientDetailsEntity client = clientService.loadClientByClientId(authorizationRequest.getClientId());
 			String url = smartLaunchContextResolver.getResolveEndpoint();
 			url += "#/resolve/";

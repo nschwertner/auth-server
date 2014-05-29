@@ -39,10 +39,8 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 	}
 
 	@Override
-	public AuthorizationRequest createAuthorizationRequest(
-			Map<String, String> inputParams) {
-		AuthorizationRequest ret = super
-				.createAuthorizationRequest(inputParams);
+	public AuthorizationRequest createAuthorizationRequest(Map<String, String> inputParams) {
+		AuthorizationRequest ret = super.createAuthorizationRequest(inputParams);
 
 		HashMap<String, String> launchReqs = new HashMap<String, String>();
 		for (Entry<String, String> e : FluentIterable.from(ret.getScope())
@@ -50,21 +48,18 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 			launchReqs.put(e.getKey(), e.getValue());
 		}
 
-		boolean requestingLaunch = launchReqs.containsKey("launch");
+		boolean requestingLaunch = launchReqs.size() > 0;
+		
 		String launchId = launchReqs.remove("launch");
-
-		if (launchId != null && !launchId.equals("?")) {
+		if (launchId != null) {
 			try {
-				ret.getExtensions().put("launch_context",
-						launchContextResolver.resolve(launchId, launchReqs));
+				ret.getExtensions().put("launch_context", launchContextResolver.resolve(launchId, launchReqs));
 			} catch (NeedUnmetException e1) {
 				e1.printStackTrace();
 				return null;
 			}
-		} else if (requestingLaunch) { // asking for launch, but no launch ID
-										// provided
+		} else if (requestingLaunch) { // asking for launch, but no launch ID provided
 			ret.getExtensions().put("external_launch_required", launchReqs);
-			ret.getExtensions().put("client_id", ret.getClientId());
 		}
 
 		ret.setScope(Sets.difference(ret.getScope(),
