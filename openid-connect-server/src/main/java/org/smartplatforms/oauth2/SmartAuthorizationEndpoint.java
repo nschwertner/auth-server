@@ -48,11 +48,15 @@ public class SmartAuthorizationEndpoint extends AuthorizationEndpoint implements
 	private static Logger logger = LoggerFactory
 			.getLogger(SmartAuthorizationEndpoint.class);
 
-	private String getCurrentRequestUrl() {
+	private String getCurrentRequestUrl(AuthorizationRequest r) {
 		ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder
 				.getRequestAttributes();
 		HttpServletRequest request = sra.getRequest();
-		return request.getQueryString();
+		String ret = request.getQueryString();
+		if (!request.getParameterMap().containsKey("scope")){
+			ret += "&scope=" + Joiner.on(" ").join(r.getScope());
+		}
+		return ret;
 	}
 
 	@RequestMapping
@@ -71,8 +75,7 @@ public class SmartAuthorizationEndpoint extends AuthorizationEndpoint implements
 
 		// TODO if launch context is needed, redirect to an external service to
 		// go and get it
-		if (authorizationRequest != null
-				&& authorizationRequest.getExtensions().containsKey(
+		if (authorizationRequest != null&& authorizationRequest.getExtensions().containsKey(
 						"external_launch_required")) {
 			logger.warn("About to redirect to context resolver UI");
 
@@ -85,7 +88,7 @@ public class SmartAuthorizationEndpoint extends AuthorizationEndpoint implements
 			url += doubleEncode(goals)+ "/against/";
 			url += doubleEncode(smartLaunchContextResolver.getFhirEndpoint())+ "/for/";
 			url += doubleEncode(client.getClientName())+ "/then/";
-			url += doubleEncode(configBean.getIssuer() + "authorize?" + getCurrentRequestUrl());
+			url += doubleEncode(configBean.getIssuer() + "authorize?" + getCurrentRequestUrl(authorizationRequest));
 
 			return new ModelAndView(new RedirectView(url));
 		}

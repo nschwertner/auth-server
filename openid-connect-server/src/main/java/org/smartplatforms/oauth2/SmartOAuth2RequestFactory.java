@@ -43,6 +43,7 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 		AuthorizationRequest ret = super.createAuthorizationRequest(inputParams);
 
 		HashMap<String, String> launchReqs = new HashMap<String, String>();
+		
 		for (Entry<String, String> e : FluentIterable.from(ret.getScope())
 				.filter(isLaunchContext).transform(toMapEntry)) {
 			launchReqs.put(e.getKey(), e.getValue());
