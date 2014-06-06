@@ -83,7 +83,7 @@ var ListWidgetChildView = Backbone.View.extend({
     tagName: 'tr',
 
     events:{
-        "click .btn-delete":'deleteItem'
+        "click .btn-delete-list-item":'deleteItem'
     },
     
     deleteItem:function (e) {
@@ -137,7 +137,7 @@ var ListWidgetView = Backbone.View.extend({
     childView:ListWidgetChildView,
 
     events:{
-        "click .btn-add":"addItem",
+    	"click .btn-add-list-item":"addItem",
         "blur input": "addItem",
         "keypress":function (e) {
         	// trap the enter key
@@ -282,9 +282,10 @@ var BlackListListView = Backbone.View.extend({
     	}
 
     	$('#loadingbox').sheet('show');
-    	$('#loading').html('blacklist');
+    	$('#loading').html('<span class="label" id="loading-blacklist">Blacklist</span> ');
 
     	$.when(this.model.fetchIfNeeded()).done(function() {
+    				$('#loading-blacklist').addClass('label-success');
     	    		$('#loadingbox').sheet('hide');
     	    		callback();
     			});    	
@@ -298,7 +299,7 @@ var BlackListListView = Backbone.View.extend({
     	e.preventDefault();
     	var _self = this;
     	$('#loadingbox').sheet('show');
-    	$('#loading').html('blacklist');
+    	$('#loading').html('<span class="label" id="loading-scopes">Blacklist</span> ');
 
     	$.when(this.model.fetch()).done(function() {
     	    		$('#loadingbox').sheet('hide');
@@ -340,6 +341,10 @@ var BlackListWidgetView = ListWidgetView.extend({
     	e.preventDefault();
 
     	var input_value = $("input", this.el).val().trim();
+    	
+    	if (input_value === "") {
+    		return;
+    	}
     	
     	// TODO: URI/pattern validation, check against existing clients
     	
@@ -458,31 +463,18 @@ var AppRouter = Backbone.Router.extend({
         this.clientStats = new StatsModel(); 
         this.accessTokensList = new AccessTokenCollection();
         this.refreshTokensList = new RefreshTokenCollection();
-        
-        this.clientListView = new ClientListView({model:this.clientList, stats: this.clientStats, systemScopeList: this.systemScopeList, whiteListList: this.whiteListList});
-        this.whiteListListView = new WhiteListListView({model:this.whiteListList, clientList: this.clientList, systemScopeList: this.systemScopeList});
-        this.approvedSiteListView = new ApprovedSiteListView({model:this.approvedSiteList, clientList: this.clientList, systemScopeList: this.systemScopeList});
-        this.blackListListView = new BlackListListView({model:this.blackListList});
-        this.systemScopeListView = new SystemScopeListView({model:this.systemScopeList});
-        this.tokensListView = new TokenListView({model: {access: this.accessTokensList, refresh: this.refreshTokensList}, clientList: this.clientList, systemScopeList: this.systemScopeList});
-    	this.dynRegRootView = new DynRegRootView({systemScopeList: this.systemScopeList});
-        this.resRegRootView = new ResRegRootView({systemScopeList: this.systemScopeList});
-        
+                
         this.breadCrumbView = new BreadCrumbView({
             collection:new Backbone.Collection()
         });
 
         this.breadCrumbView.render();
 
-        $('#loadingbox').sheet('show');
-        $("#loading").html('<span class="label" id="loading-system">System Configuration</span>');
         var base = $('base').attr('href');
         $.getJSON(base + '.well-known/openid-configuration', function(data) {
         	app.serverConfiguration = data;
-        	$('#loading-system').addClass('label-success');
         	var baseUrl = $.url(app.serverConfiguration.issuer);
 			Backbone.history.start({pushState: true, root: baseUrl.attr('relative') + 'manage/'});
-			$('#loadingbox').sheet('hide');
         });
 
     },
@@ -500,9 +492,11 @@ var AppRouter = Backbone.Router.extend({
             {text:"Manage Clients", href:"manage/#admin/clients"}
         ]);
 
-        this.clientListView.load(function() {
-        	$('#content').html(app.clientListView.render().el);
-        	app.clientListView.delegateEvents();
+        var view = new ClientListView({model:this.clientList, stats: this.clientStats, systemScopeList: this.systemScopeList, whiteListList: this.whiteListList});
+        
+        view.load(function() {
+        	$('#content').html(view.render().el);
+        	view.delegateEvents();
         	setPageTitle("Manage Clients");        	
         });
 
@@ -524,8 +518,8 @@ var AppRouter = Backbone.Router.extend({
 
     	var client = new ClientModel();
     	
-        this.clientFormView = new ClientFormView({model:client, systemScopeList: this.systemScopeList});
-        this.clientFormView.load(function() {
+        var view = new ClientFormView({model:client, systemScopeList: this.systemScopeList});
+        view.load(function() {
         	// set up this new client to require a secret and have us autogenerate one
         	client.set({
         		tokenEndpointAuthMethod: "client_secret_basic",
@@ -543,7 +537,7 @@ var AppRouter = Backbone.Router.extend({
         	}, { silent: true });
         	
         	
-        	$('#content').html(app.clientFormView.render().el);
+        	$('#content').html(view.render().el);
         	setPageTitle("New Client");
         });
     },
@@ -597,10 +591,10 @@ var AppRouter = Backbone.Router.extend({
     		    		displayClientSecret:false
     		    	}, { silent: true });
     		        
-    		        app.clientFormView = new ClientFormView({model:client, systemScopeList: app.systemScopeList});
-    		        app.clientFormView.load(function() {
+    		        var view = new ClientFormView({model:client, systemScopeList: app.systemScopeList});
+    		        view.load(function() {
     		        	console.log("yup!");
-    		        	$('#content').html(app.clientFormView.render().el);
+    		        	$('#content').html(view.render().el);
     		        	setPageTitle("Edit Client");
     		        });
     		        
@@ -639,7 +633,7 @@ var AppRouter = Backbone.Router.extend({
             {text:"Manage Whitelisted Sites", href:"manage/#admin/whitelists"}
         ]);
         
-        var view = this.whiteListListView;
+        var view = new WhiteListListView({model:this.whiteListList, clientList: this.clientList, systemScopeList: this.systemScopeList});
         
         view.load(
         	function() {
@@ -726,9 +720,9 @@ var AppRouter = Backbone.Router.extend({
             {text:"Manage Approved Sites", href:"manage/#user/approve"}
         ]);
 
-    	var view = this.approvedSiteListView;
+    	var view = new ApprovedSiteListView({model:this.approvedSiteList, clientList: this.clientList, systemScopeList: this.systemScopeList});
     	
-    	this.approvedSiteListView.load( 
+    	view.load( 
     		function(collection, response, options) {
     			$('#content').html(view.render().el);
     	    	setPageTitle("Manage Approved Sites");
@@ -744,7 +738,7 @@ var AppRouter = Backbone.Router.extend({
             {text:"Manage Active Tokens", href:"manage/#user/tokens"}
         ]);
         
-        var view = this.tokensListView;
+        var view = new TokenListView({model: {access: this.accessTokensList, refresh: this.refreshTokensList}, clientList: this.clientList, systemScopeList: this.systemScopeList});
         
         view.load(
     		function(collection, response, options) {
@@ -776,7 +770,7 @@ var AppRouter = Backbone.Router.extend({
             {text:"Manage Blacklisted Sites", href:"manage/#admin/blacklist"}
         ]);
         
-        var view = this.blackListListView;
+        var view = new BlackListListView({model:this.blackListList});
         
         view.load(
         	function(collection, response, options) {
@@ -799,7 +793,7 @@ var AppRouter = Backbone.Router.extend({
              {text:"Manage System Scopes", href:"manage/#admin/scope"}
         ]);
     	
-    	var view = this.systemScopeListView;
+    	var view = new SystemScopeListView({model:this.systemScopeList});
     	
     	view.load(function() {
     		$('#content').html(view.render().el);
@@ -860,8 +854,10 @@ var AppRouter = Backbone.Router.extend({
              {text:"Client Registration", href:"manage/#dev/dynreg"}
         ]);
     	
-    	this.dynRegRootView.load(function() {
-    			$('#content').html(app.dynRegRootView.render().el);
+    	var view = new DynRegRootView({systemScopeList: this.systemScopeList});
+    	
+    	view.load(function() {
+    			$('#content').html(view.render().el);
     			
     			setPageTitle("Self-service Client Registration");
     	});
@@ -918,8 +914,9 @@ var AppRouter = Backbone.Router.extend({
              {text:"Protected Resource Registration", href:"manage/#dev/resource"}
         ]);
     	
-    	this.resRegRootView.load(function() {
-    			$('#content').html(app.resRegRootView.render().el);
+    	var view = new ResRegRootView({systemScopeList: this.systemScopeList});
+    	view.load(function() {
+    			$('#content').html(view.render().el);
     			
     			setPageTitle("Self-service Protected Resource Registration");
     	});

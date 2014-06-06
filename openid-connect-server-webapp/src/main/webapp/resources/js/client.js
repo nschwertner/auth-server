@@ -304,8 +304,8 @@ var ClientListView = Backbone.View.extend({
     	$('#loadingbox').sheet('show');
     	$('#loading').html('<span class="label" id="loading-clients">Clients</span> ' +
     			'<span class="label" id="loading-whitelist">Whitelist</span> ' + 
-    			'<span class="label" id="loading-stats">Statistics</span> ' + 
-    			'<span class="label" id="loading-scopes">Scopes</span> '
+    			'<span class="label" id="loading-scopes">Scopes</span> ' +
+    			'<span class="label" id="loading-stats">Statistics</span> ' 
     			);
 
     	$.when(this.model.fetchIfNeeded({success:function(e) {$('#loading-clients').addClass('label-success');}}),
@@ -412,8 +412,8 @@ var ClientListView = Backbone.View.extend({
     	$('#loadingbox').sheet('show');
     	$('#loading').html('<span class="label" id="loading-clients">Clients</span> ' +
     			'<span class="label" id="loading-whitelist">Whitelist</span> ' + 
-    			'<span class="label" id="loading-stats">Statistics</span> ' + 
-    			'<span class="label" id="loading-scopes">Scopes</span> '
+    			'<span class="label" id="loading-scopes">Scopes</span> ' + 
+    			'<span class="label" id="loading-stats">Statistics</span> ' 
     			);
 
     	var _self = this;
@@ -489,13 +489,18 @@ var ClientFormView = Backbone.View.extend({
         	$("#refresh-token-timeout-unit", this.$el).prop('disabled',!$("#refresh-token-timeout-unit", this.$el).prop('disabled')); 
         	document.getElementById("refresh-token-timeout-time").value = ''; 	
         	},
-        "click .btn-cancel": function() { window.history.back(); return false; },
+        "click .btn-cancel":"cancel",
         "change #requireClientSecret":"toggleRequireClientSecret",
         "change #displayClientSecret":"toggleDisplayClientSecret",
         "change #generateClientSecret":"toggleGenerateClientSecret",
         "change #logoUri input":"previewLogo"
     },
 
+    cancel:function(e) {
+    	e.preventDefault();
+    	app.navigate('admin/clients', {trigger: true});
+    },
+    
 	load:function(callback) {
     	if (this.options.systemScopeList.isFetched) {
     		$('#loadingbox').sheet('hide');

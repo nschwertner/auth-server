@@ -59,7 +59,7 @@ public class UserInfoInterceptor extends HandlerInterceptorAdapter {
 	})
 	.create();
 
-	@Autowired
+	@Autowired (required = false)
 	private UserInfoService userInfoService;
 
 	@Override
@@ -82,10 +82,16 @@ public class UserInfoInterceptor extends HandlerInterceptorAdapter {
 				if (p instanceof OIDCAuthenticationToken) {
 					// if they're logging into this server from a remote OIDC server, pass through their user info
 					OIDCAuthenticationToken oidc = (OIDCAuthenticationToken) p;
-					modelAndView.addObject("userInfo", oidc.getUserInfo());
-					modelAndView.addObject("userInfoJson", oidc.getUserInfo().toJson());
+					if (oidc.getUserInfo() != null) {
+						modelAndView.addObject("userInfo", oidc.getUserInfo());
+						modelAndView.addObject("userInfoJson", oidc.getUserInfo().toJson());
+					} else {
+						modelAndView.addObject("userInfo", null);
+						modelAndView.addObject("userInfoJson", "null");						
+					}
 				} else {
-					if (p != null && p.getName() != null) { // don't bother checking if we don't have a principal
+					// don't bother checking if we don't have a principal or a userInfoService to work with
+					if (p != null && p.getName() != null && userInfoService != null) { 
 
 						// try to look up a user based on the principal's name
 						UserInfo user = userInfoService.getByUsername(p.getName());
