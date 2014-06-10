@@ -187,7 +187,8 @@ var ResRegEditView = Backbone.View.extend({
         "click .btn-save":"saveClient",
         "click .btn-cancel":"cancel",
         "click .btn-delete":"deleteClient",
-        "change #logoUri input":"previewLogo"
+        "change #logoUri input":"previewLogo",
+        "change #tokenEndpointAuthMethod input:radio":"toggleClientCredentials"
     },
 
     cancel:function(e) {
@@ -240,6 +241,23 @@ var ResRegEditView = Backbone.View.extend({
     	}
     },
 
+    /**
+     * Set up the form based on the current state of the tokenEndpointAuthMethod parameter
+     * @param event
+     */
+    toggleClientCredentials:function() {
+    	
+        var tokenEndpointAuthMethod = $('#tokenEndpointAuthMethod input', this.el).filter(':checked').val();
+        
+        // show or hide the signing algorithm method depending on what's selected
+        if (tokenEndpointAuthMethod == 'private_key_jwt'
+        	|| tokenEndpointAuthMethod == 'client_secret_jwt') {
+        	$('#tokenEndpointAuthSigningAlg', this.el).show();
+        } else {
+        	$('#tokenEndpointAuthSigningAlg', this.el).hide();
+        }
+    },
+    
     disableUnsupportedJOSEItems:function(serverSupported, query) {
         var supported = ['default'];
         if (serverSupported) {
@@ -264,27 +282,6 @@ var ResRegEditView = Backbone.View.extend({
     	}
     },
 
-    // maps from a form-friendly name to the real grant parameter name
-    grantMap:{
-    	'authorization_code': 'authorization_code',
-    	'password': 'password',
-    	'implicit': 'implicit',
-    	'client_credentials': 'client_credentials',
-    	'redelegate': 'urn:ietf:params:oauth:grant_type:redelegate',
-    	'refresh_token': 'refresh_token'
-    },
-    
-    // maps from a form-friendly name to the real response type parameter name
-    responseMap:{
-    	'code': 'code',
-    	'token': 'token',
-    	'idtoken': 'id_token',
-    	'token-idtoken': 'token id_token',
-    	'code-idtoken': 'code id_token',
-    	'code-token': 'code token',
-    	'code-token-idtoken': 'code token id_token'
-    },
-
     saveClient:function (e) {
     	e.preventDefault();
 
@@ -292,22 +289,6 @@ var ResRegEditView = Backbone.View.extend({
 
         // build the scope object
         var scopes = this.scopeCollection.pluck("item").join(" ");
-        
-        // build the grant type object
-        var grantTypes = [];
-        $.each(this.grantMap, function(index,type) {
-            if ($('#grantTypes-' + index).is(':checked')) {
-                grantTypes.push(type);
-            }
-        });
-        
-        // build the response type object
-        var responseTypes = [];
-        $.each(this.responseMap, function(index,type) {
-        	if ($('#responseTypes-' + index).is(':checked')) {
-        		responseTypes.push(type);
-        	}
-        });
         
         var contacts = this.contactsCollection.pluck('item');
         var userInfo = getUserInfo();
@@ -321,7 +302,7 @@ var ResRegEditView = Backbone.View.extend({
             client_name:$('#clientName input').val(),
             logo_uri:$('#logoUri input').val(),
             scope: scopes,
-            
+            client_secret: null, // never send a client secret
             tos_uri: $('#tosUri input').val(),
             policy_uri: $('#policyUri input').val(),
             client_uri: $('#clientUri input').val(),
@@ -431,6 +412,7 @@ var ResRegEditView = Backbone.View.extend({
         	// TODO: autocomplete from spec
         	collection: this.defaultAcrValuesCollection}).render().el);
 
+        this.toggleClientCredentials();
         this.previewLogo();
         
         // disable unsupported JOSE algorithms
