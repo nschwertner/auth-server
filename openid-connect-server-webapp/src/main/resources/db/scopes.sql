@@ -26,8 +26,10 @@ INSERT INTO system_scope_TEMP (scope, description, icon, allow_dyn_reg, default_
   ('launch/resource', 'Launch with resource context', 'user', true, false, true, 'Launch resource'),
   ('launch/other', 'Launch with other context', 'user', true, false, true, 'Launch other'), 
   ('user/Patient.read', 'all FHIR permissions for user', 'user', true, false, false, null), 
-  ('user/*.*', 'Read all Patient data that you can access', 'user', true, false, false, null), 
-  ('patient/*.read', 'all FHIR permissions for a single patient record', 'user', true, false, false, null), 
+  ('user/*.read', 'Read all FHIR data that you can access', 'user', true, false, false, null), 
+  ('user/*.*', 'All FHIR permissions for data that you can access', 'user', true, false, false, null), 
+  ('patient/*.read', 'Read all FHIR data for a single patient record', 'user', true, false, false, null), 
+  ('patient/*.*', 'All FHIR permissions for a single patient record', 'user', true, false, false, null), 
   ('offline_access', 'offline access', 'time', true, true, false, null);
   
 --
