@@ -131,7 +131,15 @@ public class OAuth2AccessTokenEntity implements OAuth2AccessToken {
 		}
 		if (getLaunchContext() != null) {
 			for (LaunchContextEntity cparam : getLaunchContext()){
-				map.put(cparam.getName(), cparam.getValue());				
+				// Hack to cast back boolean values that have been converted into strings
+				String val = cparam.getValue();
+				if (val.equals("true")) {
+					map.put(cparam.getName(), true);
+				} else if (val.equals("false")) {
+					map.put(cparam.getName(), false);
+                                } else {
+					map.put(cparam.getName(), val);
+				}			
 			}
 		}
 		return map;
