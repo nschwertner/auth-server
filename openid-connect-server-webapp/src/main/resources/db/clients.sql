@@ -31,6 +31,7 @@ INSERT INTO client_scope_TEMP (owner_id, scope) VALUES
 	('client', 'smart'),
 	('client', 'user/Patient.read'),
 	('client', 'user/*.*'),
+	('client', 'user/*.read'),
 	('client', 'patient/*.*'),
 	('client', 'patient/*.read'),	
 	('client', 'offline_access');
