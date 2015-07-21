@@ -52,17 +52,24 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 		}
 
 		boolean requestingLaunch = launchReqs.size() > 0;
-		
-		String launchId = launchReqs.remove("launch");
-		if (launchId != null) {
-			try {
-				ret.getExtensions().put("launch_context", launchContextResolver.resolve(launchId, launchReqs));
-			} catch (NeedUnmetException e1) {
-				ret.getExtensions().put("invalid_launch", "Couldn't resolve launch id: " + launchId);
-			}
-		} else if (requestingLaunch) { // asking for launch, but no launch ID provided
-			ret.getExtensions().put("external_launch_required", launchReqs);
-		}
+
+        launchReqs.remove("launch");
+
+        String launchId = ret.getRequestParameters().get("launch");
+        String aud = ret.getRequestParameters().get("aud");
+        if (!launchContextResolver.getServiceURL().equals(aud)) {
+            ret.getExtensions().put("invalid_launch", "Incorrect service URL (aud): " + aud);
+        } else {
+            if (launchId != null) {
+                try {
+                    ret.getExtensions().put("launch_context", launchContextResolver.resolve(launchId, launchReqs));
+                } catch (NeedUnmetException e1) {
+                    ret.getExtensions().put("invalid_launch", "Couldn't resolve launch id: " + launchId);
+                }
+            } else if (requestingLaunch) { // asking for launch, but no launch ID provided
+                ret.getExtensions().put("external_launch_required", launchReqs);
+            }
+        }
 
 		ret.setScope(Sets.difference(ret.getScope(),
 				FluentIterable.from(ret.getScope()).filter(isLaunchContext)
