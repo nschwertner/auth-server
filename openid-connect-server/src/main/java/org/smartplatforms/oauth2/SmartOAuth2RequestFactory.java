@@ -57,7 +57,17 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
 
         String launchId = ret.getRequestParameters().get("launch");
         String aud = ret.getRequestParameters().get("aud");
-        if (!launchContextResolver.getServiceURL().equals(aud)) {
+        String serviceURL = launchContextResolver.getServiceURL();
+        
+        if (aud.endsWith("/")) {
+            aud = aud.substring(0, aud.length() - 1);
+        }
+        
+        if (serviceURL.endsWith("/")) {
+            serviceURL = serviceURL.substring(0, serviceURL.length() - 1);
+        }
+        
+        if (!serviceURL.equals(aud)) {
             ret.getExtensions().put("invalid_launch", "Incorrect service URL (aud): " + aud);
         } else {
             if (launchId != null) {
