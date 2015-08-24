@@ -59,11 +59,11 @@ public class SmartOAuth2RequestFactory extends ConnectOAuth2RequestFactory {
         String aud = ret.getRequestParameters().get("aud");
         String serviceURL = launchContextResolver.getServiceURL();
         
-        if (aud.endsWith("/")) {
+        if (aud != null && aud.endsWith("/")) {
             aud = aud.substring(0, aud.length() - 1);
         }
         
-        if (serviceURL.endsWith("/")) {
+        if (serviceURL != null && serviceURL.endsWith("/")) {
             serviceURL = serviceURL.substring(0, serviceURL.length() - 1);
         }
         
